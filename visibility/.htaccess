@@ -1,0 +1,25 @@
+# Ce fichier est destiné à être utilisé avec Apache.
+# Ce code vérifie que les modules mod_rewrite et mod_negotiation sont activés.
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        # Désactive les options MultiViews et Indexes pour éviter la confusion entre les noms de fichiers et les dossiers.
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    # Active le moteur de réécriture pour les réécritures d'URL.
+    RewriteEngine On
+
+    # Gère l'en-tête d'autorisation pour une meilleure sécurité.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirige les barres obliques terminales si ce n'est pas un dossier.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Envoie les requêtes au contrôleur frontal.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
